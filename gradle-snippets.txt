@@ -1,0 +1,43 @@
+=== settings / project-level build.gradle ===
+plugins {
+    id 'com.google.gms.google-services' version '4.4.2' apply false
+}
+(older project style: buildscript { dependencies { classpath 'com.google.gms:google-services:4.4.2' } })
+
+=== app/build.gradle ===
+plugins {
+    id 'com.android.application'
+    id 'com.google.gms.google-services'
+}
+
+android {
+    namespace 'com.avacs.clone'        // must match the package in the Java files
+    compileSdk 34
+    defaultConfig {
+        applicationId "com.avacs.clone"
+        minSdk 21
+        targetSdk 34
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation platform('com.google.firebase:firebase-bom:33.5.1')
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-firestore'
+}
+
+=== Using the dialog (any Activity) ===
+String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();   // or another user's uid
+new ProfileDialog(this, uid)
+        .setListener(profile -> { /* open the edit screen here */ })
+        .show();
+
+=== After sign-up (once) ===
+new ProfileRepository().createIfMissing(uid, nick, new ProfileRepository.Callback<Boolean>() {
+    @Override public void onResult(Boolean created) { }
+    @Override public void onError(Exception e) { }
+});
